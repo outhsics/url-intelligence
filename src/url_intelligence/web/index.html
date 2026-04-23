@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Intelligence</title>
+    <link rel="stylesheet" href="/static/app.css" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">URL Intelligence</p>
+        <h1>把链接变成 AI 真能看懂的内容</h1>
+        <p class="hero-copy">
+          粘贴微信公众号、X、YouTube 或普通网页链接。系统先抽正文、字幕和元数据，再按需交给模型分析。
+        </p>
+        <div class="hero-actions">
+          <a class="ghost-link" href="/docs" target="_blank" rel="noreferrer">看 API 文档</a>
+          <button class="ghost-button" id="fill-demo" type="button">填入示例</button>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <form class="control-panel" id="analyze-form">
+          <label class="field-label" for="url-input">链接</label>
+          <textarea
+            id="url-input"
+            name="url"
+            rows="3"
+            placeholder="https://mp.weixin.qq.com/... 或 https://x.com/... 或 https://www.youtube.com/watch?v=..."
+          ></textarea>
+
+          <div class="quick-picks">
+            <button class="chip" type="button" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">YouTube 示例</button>
+            <button class="chip" type="button" data-url="https://x.com/OpenAI/status/1953163917247883773">X 示例</button>
+            <button class="chip" type="button" data-url="https://example.com">网页示例</button>
+          </div>
+
+          <div class="button-row">
+            <button class="primary-button" type="submit" data-mode="extract">只提取内容</button>
+            <button class="secondary-button" type="submit" data-mode="analyze">提取并分析</button>
+          </div>
+
+          <p class="hint">
+            “提取并分析” 需要在后端配置 `OPENAI_API_KEY`，或者配置 GLM 兼容参数。
+          </p>
+        </form>
+
+        <section class="result-panel">
+          <div class="status-card" id="status-card">
+            <span class="status-dot"></span>
+            <div>
+              <p class="status-title">等待请求</p>
+              <p class="status-text">页面已经连到本地服务。提交一个链接后，这里会显示进度和结果。</p>
+            </div>
+          </div>
+
+          <div class="result-grid" id="result-grid">
+            <article class="result-card featured-card">
+              <p class="card-label">结果预览</p>
+              <h2 id="result-title">还没有结果</h2>
+              <p id="result-subtitle">先贴一个链接，再选择“只提取内容”或“提取并分析”。</p>
+            </article>
+
+            <article class="result-card">
+              <div class="card-head">
+                <p class="card-label">结构化信息</p>
+                <span class="pill" id="source-pill">-</span>
+              </div>
+              <dl class="meta-list">
+                <div><dt>作者</dt><dd id="meta-author">-</dd></div>
+                <div><dt>发布时间</dt><dd id="meta-published">-</dd></div>
+                <div><dt>语言</dt><dd id="meta-language">-</dd></div>
+                <div><dt>图片数</dt><dd id="meta-images">0</dd></div>
+              </dl>
+            </article>
+
+            <article class="result-card full-span">
+              <div class="card-head">
+                <p class="card-label">正文 / 字幕</p>
+                <span class="pill subtle" id="content-kind">markdown</span>
+              </div>
+              <pre class="content-preview" id="content-preview">结果会显示在这里。</pre>
+            </article>
+
+            <article class="result-card full-span hidden" id="analysis-card">
+              <div class="card-head">
+                <p class="card-label">AI 分析</p>
+                <span class="pill accent">analysis</span>
+              </div>
+              <div class="analysis-grid">
+                <section>
+                  <h3>摘要</h3>
+                  <p id="analysis-summary">-</p>
+                </section>
+                <section>
+                  <h3>关键点</h3>
+                  <ul id="analysis-points" class="bullet-list"></ul>
+                </section>
+                <section>
+                  <h3>实体</h3>
+                  <ul id="analysis-entities" class="bullet-list"></ul>
+                </section>
+                <section>
+                  <h3>风险与追问</h3>
+                  <ul id="analysis-risks" class="bullet-list"></ul>
+                  <ul id="analysis-questions" class="bullet-list muted-list"></ul>
+                </section>
+              </div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+  </html>

@@ -1,13 +1,24 @@
 from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from url_intelligence.analyzer import AIAnalyzer
 from url_intelligence.models import ExtractRequest, PipelineResult
 from url_intelligence.service import URLIntelligenceService
+from pathlib import Path
 
 app = FastAPI(title="URL Intelligence", version="0.1.0")
 service = URLIntelligenceService()
+web_dir = Path(__file__).with_name("web")
+
+app.mount("/static", StaticFiles(directory=web_dir), name="static")
+
+
+@app.get("/", include_in_schema=False)
+def home() -> FileResponse:
+    return FileResponse(web_dir / "index.html")
 
 
 @app.get("/healthz")
