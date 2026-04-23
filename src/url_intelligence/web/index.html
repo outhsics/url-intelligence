@@ -43,7 +43,7 @@
           </div>
 
           <p class="hint">
-            “提取并分析” 需要在后端配置 `OPENAI_API_KEY`，或者配置 GLM 兼容参数。
+            “提取并分析” 支持 OpenAI、GLM OpenAI 兼容接口，或 Anthropic / Claude 兼容接口。
           </p>
         </form>
 
@@ -79,7 +79,10 @@
             <article class="result-card full-span">
               <div class="card-head">
                 <p class="card-label">正文 / 字幕</p>
-                <span class="pill subtle" id="content-kind">markdown</span>
+                <div class="card-actions">
+                  <button class="mini-button" id="copy-content" type="button">复制全文</button>
+                  <span class="pill subtle" id="content-kind">markdown</span>
+                </div>
               </div>
               <pre class="content-preview" id="content-preview">结果会显示在这里。</pre>
             </article>

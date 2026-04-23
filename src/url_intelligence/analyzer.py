@@ -9,13 +9,14 @@ from url_intelligence.config import settings
 from url_intelligence.models import AnalysisOutput, ExtractedContent
 
 
-SYSTEM_PROMPT = """You analyze normalized URL content for a user.
-Return a concise but useful structured result.
-Base all claims only on the provided content.
-If information is missing, say so briefly in the relevant fields."""
+SYSTEM_PROMPT = """你要分析已经被标准化的 URL 内容，并返回结构化结果。
+所有自然语言字段统一使用简体中文输出。
+专有名词、作品名、品牌名、地名、人名可以保留原文。
+所有结论只能基于提供的内容，不要补充外部事实。
+如果信息缺失，在对应字段里简短说明。"""
 
-JSON_PROMPT = """Analyze the extracted URL content and return JSON only.
-The JSON must contain exactly these keys:
+JSON_PROMPT = """请分析抽取后的 URL 内容，并且只返回 JSON。
+JSON 必须且只能包含以下键：
 - summary: string
 - key_points: string[]
 - entities: string[]
@@ -23,9 +24,13 @@ The JSON must contain exactly these keys:
 - sentiment: string
 - suggested_questions: string[]
 
-Do not wrap the JSON in markdown fences.
-Do not add extra keys.
-Keep the response grounded only in the supplied content."""
+要求：
+- 不要使用 markdown 代码块包裹 JSON
+- 不要添加额外字段
+- `summary`、`key_points`、`risks`、`suggested_questions` 必须用中文
+- `sentiment` 使用中文短词，例如“正面”“中性”“负面”
+- `entities` 优先保留实体原名，必要时可加中文说明
+- 所有内容都必须严格基于提供的正文和字幕"""
 
 
 def _extract_parsed_output(response) -> AnalysisOutput:
@@ -119,8 +124,7 @@ class AIAnalyzer:
                 {
                     "role": "user",
                     "content": (
-                        "Analyze this extracted URL content. Provide a summary, key points, entities, "
-                        "possible risks or caveats, sentiment, and good follow-up questions.\n\n"
+                        "请分析这份抽取后的 URL 内容，并返回中文的摘要、关键点、实体、风险提示、情绪判断和后续追问。\n\n"
                         f"{user_payload}"
                     ),
                 },
@@ -144,7 +148,7 @@ class AIAnalyzer:
                 {
                     "role": "user",
                     "content": (
-                        "Analyze this extracted URL content and return the required JSON.\n\n"
+                        "请分析这份抽取后的 URL 内容，并按要求返回中文 JSON。\n\n"
                         f"{json.dumps(user_payload, ensure_ascii=False)}"
                     ),
                 },
@@ -163,7 +167,7 @@ class AIAnalyzer:
                 {
                     "role": "user",
                     "content": (
-                        "Analyze this extracted URL content and return the required JSON.\n\n"
+                        "请分析这份抽取后的 URL 内容，并按要求返回中文 JSON。\n\n"
                         f"{json.dumps(user_payload, ensure_ascii=False)}"
                     ),
                 }

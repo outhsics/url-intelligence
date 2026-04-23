@@ -14,6 +14,7 @@ const metaLanguage = document.querySelector("#meta-language");
 const metaImages = document.querySelector("#meta-images");
 const contentPreview = document.querySelector("#content-preview");
 const contentKind = document.querySelector("#content-kind");
+const copyContentButton = document.querySelector("#copy-content");
 const analysisCard = document.querySelector("#analysis-card");
 const analysisSummary = document.querySelector("#analysis-summary");
 const analysisPoints = document.querySelector("#analysis-points");
@@ -24,6 +25,28 @@ const analysisQuestions = document.querySelector("#analysis-questions");
 fillDemoButton.addEventListener("click", () => {
   urlInput.value = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
   urlInput.focus();
+});
+
+copyContentButton.addEventListener("click", async () => {
+  const text = contentPreview.textContent?.trim();
+  if (!text || text === "结果会显示在这里。") {
+    setError("没有可复制内容", "先提取一个链接，再复制全文。");
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(text);
+    const oldLabel = copyContentButton.textContent;
+    copyContentButton.textContent = "已复制";
+    copyContentButton.disabled = true;
+    window.setTimeout(() => {
+      copyContentButton.textContent = oldLabel;
+      copyContentButton.disabled = false;
+    }, 1500);
+    setReady("全文已复制", "正文 / 字幕的完整文本已经复制到剪贴板。");
+  } catch (error) {
+    setError("复制失败", "浏览器没有完成复制，请重试。");
+  }
 });
 
 for (const button of quickPickButtons) {
@@ -84,7 +107,7 @@ function renderContent(content, analysis) {
   metaPublished.textContent = content.published_at || "-";
   metaLanguage.textContent = content.language || "-";
   metaImages.textContent = String((content.images || []).length);
-  contentKind.textContent = content.transcript ? "markdown + transcript" : "markdown";
+  contentKind.textContent = content.transcript ? "正文 + 字幕" : "正文";
   contentPreview.textContent = content.markdown || content.transcript || "没有提取到正文。";
 
   if (!analysis) {
