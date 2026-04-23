@@ -35,7 +35,7 @@ copyContentButton.addEventListener("click", async () => {
   }
 
   try {
-    await navigator.clipboard.writeText(text);
+    await copyText(text);
     const oldLabel = copyContentButton.textContent;
     copyContentButton.textContent = "已复制";
     copyContentButton.disabled = true;
@@ -48,6 +48,37 @@ copyContentButton.addEventListener("click", async () => {
     setError("复制失败", "浏览器没有完成复制，请重试。");
   }
 });
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch (error) {
+      // Fall through to the legacy copy path for in-app browsers.
+    }
+  }
+
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.setAttribute("readonly", "");
+  textArea.style.position = "fixed";
+  textArea.style.opacity = "0";
+  textArea.style.pointerEvents = "none";
+  textArea.style.left = "-9999px";
+  textArea.style.top = "0";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  textArea.setSelectionRange(0, text.length);
+
+  const copied = document.execCommand("copy");
+  document.body.removeChild(textArea);
+
+  if (!copied) {
+    throw new Error("copy failed");
+  }
+}
 
 for (const button of quickPickButtons) {
   button.addEventListener("click", () => {

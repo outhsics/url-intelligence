@@ -1,18 +1,32 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from url_intelligence.analyzer import AIAnalyzer
 from url_intelligence.models import ExtractRequest, PipelineResult
 from url_intelligence.service import URLIntelligenceService
-from pathlib import Path
 
 app = FastAPI(title="URL Intelligence", version="0.1.0")
 service = URLIntelligenceService()
 web_dir = Path(__file__).with_name("web")
 
+
+class NoCacheMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if request.url.path == "/" or request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        return response
+
+
+app.add_middleware(NoCacheMiddleware)
 app.mount("/static", StaticFiles(directory=web_dir), name="static")
 
 
