@@ -66,9 +66,21 @@ cp .env.example .env
 Set at least:
 
 ```bash
+AI_PROVIDER=openai
 OPENAI_API_KEY=your_key
 OPENAI_MODEL=gpt-5.4-mini
 ```
+
+For `GLM`, switch to the official OpenAI-compatible endpoint documented by Zhipu:
+
+```bash
+AI_PROVIDER=glm
+OPENAI_API_KEY=your_glm_key
+OPENAI_MODEL=glm-5
+OPENAI_BASE_URL=https://open.bigmodel.cn/api/paas/v4/
+```
+
+This project will then route analysis through `chat.completions.create(...)` with JSON output, which is the compatibility path shown in Zhipu's official docs.
 
 Run the API:
 
@@ -126,4 +138,4 @@ The extractor always normalizes to one content shape:
 - This is an MVP, not a full feed reader.
 - `X/Twitter` extraction remains best-effort because public access rules can change.
 - For WeChat history sync, subscriptions, and authenticated feeds, you would add a separate ingestion job later.
-
+- OpenAI uses the `Responses API` path in this project; GLM uses the OpenAI-compatible `chat.completions` path.

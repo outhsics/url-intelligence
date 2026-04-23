@@ -10,6 +10,7 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
+    ai_provider: str = Field(default="openai", alias="AI_PROVIDER")
     openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
     openai_model: str = Field(default="gpt-5.4-mini", alias="OPENAI_MODEL")
     openai_base_url: str | None = Field(default=None, alias="OPENAI_BASE_URL")
